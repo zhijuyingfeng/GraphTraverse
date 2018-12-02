@@ -1,10 +1,15 @@
-#include "graph.h"
+#include "mainwindow.h"
+#include <QApplication>
 
 const int cityNum = 25;
+const int edgeNum=30;
 
-int main()
+int main(int argc, char *argv[])
 {
-    const string cities[] =
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.setWindowTitle("Graph Traverse");
+    const std::string cities[] =
             {
                     "哈尔滨","长春","沈阳","大连","天津","北京","呼和浩特","兰州","乌鲁木齐","西宁",
                     "西安","郑州","徐州","上海","武汉","成都","昆明","贵阳","株洲","南昌","福州","深圳",
@@ -19,20 +24,15 @@ int main()
                     {16,17,639},{17,23,607},{18,23,672},{18,22,675},{21,22,140},{23,24,255}
             };
 
-    //for (int i = 0; i < sizeof(edges)/(sizeof(int)*3); i++)
-    //{
-    //	cout <<i+1<<"\t"<< cities[edges[i][0]] << "->" << cities[edges[i][1]] << "\t" << edges[i][2] << endl;
-    //}
+    for(int i=0;i<cityNum;i++)
+    {
+        w.addVertex(cities[i]);
+    }
+    for(int i=0;i<edgeNum;i++)
+    {
+        w.addEdge(edges[i][0], edges[i][1], edges[i][2]);
+    }
+    w.show();
 
-    Graph G;
-    for (int i = 0; i < cityNum; i++)
-    {
-        G.addVertex(cities[i]);
-    }
-    for (int i = 0; i < 30; i++)
-    {
-        G.addEdge(edges[i][0], edges[i][1], edges[i][2]);
-    }
-    G.DFS(22);
-    return 0;
+    return a.exec();
 }

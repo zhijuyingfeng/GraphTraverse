@@ -23,7 +23,7 @@ struct EdgeNode
     EdgeNode *path2;//
     EdgeNode():mark(0),distance(-1),vertex1(-1),vertex2(-1),path1(NULL),path2(NULL){}
     EdgeNode(const int &m,const int& dis,const int &v1,const int &v2,EdgeNode* p1,EdgeNode* p2):\
-							mark(m),distance(dis),vertex1(v1),vertex2(v2),path1(p1),path2(p2){}
+                            mark(m),distance(dis),vertex1(v1),vertex2(v2),path1(p1),path2(p2){}
 };
 
 struct VertexNode
