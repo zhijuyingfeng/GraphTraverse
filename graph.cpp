@@ -4,8 +4,9 @@
 
 #include "graph.h"
 
-Graph::~Graph()
+Graph::~Graph()//析构函数
 {
+    //释放边集内存
     for (vector<EdgeNode*>::iterator it = Edges.begin(); it != Edges.end(); it++)
     {
         delete (*it);
@@ -14,10 +15,11 @@ Graph::~Graph()
 
 void Graph::addVertex(string name)
 {
-    Vertexes.push_back(VertexNode(Vertexes.size()+ 1, name, NULL));
+    Vertexes.push_back(VertexNode(Vertexes.size()+ 1, name, NULL));//将顶点加入到顶点集中
 }
 
 void Graph::addEdge(const int& v1, const int& v2, const int& dis)
+
 {
     int size = Vertexes.size();
     if (size < v1 || size < v2)
@@ -27,54 +29,57 @@ void Graph::addEdge(const int& v1, const int& v2, const int& dis)
     }
     EdgeNode* temp = new EdgeNode(0, dis, v1, v2, NULL, NULL);
 
+    //类似于在链表头部插入节点
     temp->path1 = Vertexes[v1].Edge;
     Vertexes[v1].Edge = temp;
 
     temp->path2 = Vertexes[v2].Edge;
     Vertexes[v2].Edge = temp;
 
-    Edges.push_back(temp);
+    Edges.push_back(temp);//将该边加入到边集中
 }
 
 
 void Graph::BFS(const int &start)
 {
-    queue<int> Q;
-    Q.push(start);
-    int temp=-1;
-    int size = Vertexes.size();
+    queue<int> Q;//遍历队列
+    Q.push(start);//初始节点入队
+    int temp=-1;//表示当前遍历的节点
+    int size = Vertexes.size();//全部连通的节点数
 
-    bool *visited = new bool[size];
-    bool *appeared=new bool[size];
+    bool *visited = new bool[size];//标志节点是否被访问过
+    bool *appeared=new bool[size];//标志节点是否进过队列
     memset(visited, 0, sizeof(bool)*size);
     memset(appeared, 0, sizeof(bool)*size);
 
-    TreeNode* TreeNodes=new  TreeNode[size];
-    int kid;
+    TreeNode* TreeNodes=new  TreeNode[size];//表示生成树
+    int kid;//表示正在遍历的节点的孩子节点
 
-    EdgeNode* edge;
+    EdgeNode* edge;//依附于该节点的边
     while (!Q.empty())
     {
         temp = Q.front();
         Q.pop();
-        if (visited[temp])
+        if (visited[temp])//该节点已经被访问过时跳过后面步骤
         {
             continue;
         }
 
         visited[temp]=1;
-        cout << Vertexes[temp].location << endl;
-        edge = Vertexes[temp].Edge;
+        cout << Vertexes[temp].location << endl;//访问节点
+        edge = Vertexes[temp].Edge;//edge指向依附该节点的第一条边
         while (edge)
         {
             kid=-1;
-            if (edge->vertex1 == temp)
+
+            //判断边的哪个端点是目前访问的节点
+            if (edge->vertex1 == temp)//该边的vertex1是目前访问的端点
             {
                 kid=edge->vertex2;
                 Q.push(kid);
                 edge = edge->path1;
             }
-            else if (edge->vertex2 == temp)
+            else if (edge->vertex2 == temp)//该边的vertex2是目前访问的端点
             {
                 kid=edge->vertex1;
                 Q.push(kid);
@@ -82,12 +87,14 @@ void Graph::BFS(const int &start)
             }
             if(kid>=0&&!appeared[kid]&&!visited[kid])
             {
+                //构建顶点之间的关系
                 TreeNodes[kid].parent=temp;
                 TreeNodes[temp].children.push_back(kid);
                 appeared[kid]=1;
             }
         }
     }
+    //利用TreeNodes构建可视化生成树
     createGraph(TreeNodes);
     delete[]visited;
     delete[]TreeNodes;
@@ -141,43 +148,45 @@ void Graph::createGraph(const TreeNode *TreeNodes)
 
 void Graph::DFS(const int &start)
 {
-    stack<int> S;
-    S.push(start);
+    stack<int> S;//访问栈
+    S.push(start);//初始节点入栈
 
-    int temp;
-    int size=Vertexes.size();
-    bool *visited=new bool[size];
-    TreeNode* TreeNodes=new TreeNode[size];
+    int temp;//当前正在访问的节点序号
+    int size=Vertexes.size();//全部连通的节点数
+    bool *visited=new bool[size];//标志该节点是否被访问过
+    TreeNode* TreeNodes=new TreeNode[size];//生成树
     memset(visited,0,sizeof(bool)*size);
-    bool allVisited;
-    EdgeNode* edge;
+    bool allVisited;//标志依附于该节点的边是否全部访问完毕
+    EdgeNode* edge;//依附于该节点的边
 
     while(!S.empty())
     {
-        temp=S.top();
-        allVisited=1;
-        if(!visited[temp])
+        temp=S.top();//当前访问节点出栈
+        allVisited=1;//每次循环开始时设置其为1
+        if(!visited[temp])//若没有访问过该节点，则访问
         {
             visited[temp]=1;
             cout<<Vertexes[temp].location<<endl;
         }
-        edge=Vertexes[temp].Edge;
+        edge=Vertexes[temp].Edge;//指向依附于该节点的第一条边
         while(edge)
         {
-            if(edge->vertex1==temp)
+            //判断边的哪个端点是目前访问的节点
+            if(edge->vertex1==temp)//该边的vertex1是目前访问的端点
             {
+                //如果没有访问过，将其入栈
                 if(!visited[edge->vertex2])
                 {
                     TreeNodes[temp].children.push_back(edge->vertex2);
                     S.push(edge->vertex2);
-                    allVisited=0;
+                    allVisited=0;//因为存在没有访问过的节点，allVisited置0
                     break;
                 }
                 edge=edge->path1;
             }
             else if(edge->vertex2==temp)
             {
-                if(!visited[edge->vertex1])
+                if(!visited[edge->vertex1])//该边的vertex2是目前访问的端点
                 {
                     S.push(edge->vertex1);
                     TreeNodes[temp].children.push_back(edge->vertex1);
@@ -187,7 +196,7 @@ void Graph::DFS(const int &start)
                 edge=edge->path2;
             }
         }
-        if(allVisited)
+        if(allVisited)//如果依附于该节点的所有边全部已经访问过，将该节点出栈
         {
             S.pop();
         }
